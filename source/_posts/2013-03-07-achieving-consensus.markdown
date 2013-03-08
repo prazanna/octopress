@@ -1,0 +1,66 @@
+---
+layout: post
+title: "Achieving Consensus"
+date: 2013-03-07 21:52
+comments: true
+categories: [Distributed Systems, Theory]
+---
+
+Designing a scalable, reliable and fault tolerant Data system:
+
+Lets say we are tasked to design a data storage and retrieval system, which is scalable, reliable and fault-tolerant. A Scalable data system is a system which can scale up storage and computations on the stored data horizontally with additional disks and computing power. A Reliable system is a system which does not compromise availability of data any more than it should ( given the data consistency requirements ). Fault tolerant systems particularly interest me. I think the most obvious is the system fault (e.g., hardware goes down, network goes down) and there are more concrete replication strategies to guard us. There is a another kind of fault, Human introduced fault. Faulty programs could be written by even smart humans or an OOPS! moment introducing the fault in the system. You could have all the code-reviews done, have all the experts in your company look at every program that modifies the data, but a faulty program corrupting the data is inevitable.
+
+The immediate solution which comes to my mind is to set specific checkpoints on your system, backup the data and restore the data to the last checkpoint. Let us assume we have a way to figure out if the data system is corrupted and also know what entities in our system are corrupted. Restoring just the corrupted data is sometimes non-trivial, even if we can isolate the locality of the corruption, its hard to determine what other pieces of data in the system was computed/derived from the corrupted data. So just restoring the corrupted data might not result in a consistent view of the data system. So we have to restore the entire data set to the last known consistent checkpoint.
+
+Lets assume you know when your data is not right and at that point you can restore the data system to the last checkpoint. I do not like this approach for 3 reasons
+	1	Data loss - We would be going back in time and depending on your requirements, this could be a big NO-NO. 
+	2	Loss in system availability - We would have to bring down the system, during the restoration of the backup data. We do not want to serve corrupted data. Depending on the size of the data set, this could be few minutes to few hours.
+	3	Post-mortem is hard - Its not always easy to figure out who the culprit is and isolate the reason for a corrupted data set.
+
+Today big data systems, allow you to store up to certain versions for a particular data column. For reasons discussed earlier, we do not want to just revert these corrupted columns to their previous versions.
+I believe the problem of reacting to a corrupted system is hard and requires a lot of alert eyes and book keeping. I believe we could think different in terms of what we view as data and how we store them to alleviate the pain of building a human fault tolerant system.
+
+Aware of the risk of trivializing the scope of a complex data system, Lets take up a simple data system as an example for the sake of concreteness. Lets say we are building a data system for a social network. 
+We have users who have other users as their friends. Lets try to model it the way most of us would
+
+
+Lets say, In your social network, you have decided to implement a feature that for all the posts that you have liked you will automatically become friends with the owner of the post and you write a program which iterated through all likes and insert a record into the friends table if one does not exist already. You have tested this program against the test database and it “seems” to work fine and you run it against the production database and it seems to have gone pretty well tot you. In a few days, you get a bunch of complaints that your users are now friends with people who they never liked before. How would you approach this now? You can never reliably go back to the state and also preserving the genuine friends additions/removal during this time. 
+
+I think the problem is with having all the data in the system as mutable. There are always certain immutable facts (Master data) from which all useful data is derived from (derived data). What are the immutable facts in our data system? A friend F1 adding/removing friend F2 at time T is an immutable fact. 
+ 
+We would need to distinguish what the facts are and what are the derived data are in our system
+
+when you “like” someone’s post, you 
+
+If  by some insidious program A’s friends list has been modified as {B, C, D, E, F}
+ 
+If by some insidious program, a program has modified the friends list of a user A. 
+
+
+Remember, we are building a scalable system which is supposed to store really huge amounts of data and so this restoration of data from backup
+
+This blog is about designing a system from ground-up.
+
+To guard against the human introduced fault, I think is 
+
+
+What is of particular interest to me, is the fault-tolerance. System fault tolerance are the easy ones to handle, we have various data replication strategies
+which guard us against this kind of faults. 
+
+dsf
+
+
+<span style="font-family: Verdana; font-size: 13px;">
+<pre class="brush: jscript; gutter: true;highlight: [4, 5, 6]">
+$('#edit').click(function(event) {
+    event.preventDefault();
+    form.find(':disabled').each(function() {
+        $(this).removeAttr('disabled');
+    });
+});
+</pre>
+</span>
+
+
+
+
